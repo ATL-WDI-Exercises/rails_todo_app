@@ -1,4 +1,4 @@
-# TODO CRUD App in Rails
+# TODO CRUD App in Rails with Home Grown AuthN and AuthZ
 
 This is a simple Rails App for a TODO list. This app uses the following technologies:
 
