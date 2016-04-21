@@ -458,7 +458,11 @@ Let's reflect on what we have done:
 * Created some static pages, a navbar, and flash message support
 * Created MVC CRUD for a list of TODOs
 
-But we have one *major* problem: how do we support multiple users each with their own TODO list? To do that we need to add Authentication, Authorization, and Session Management to our app. But first, lets discuss some security concepts:
+But we have one *major* problem:
+
+> How do we support multiple users each with their own TODO list?
+
+To do that we need to add Authentication, Authorization, and Session Management to our app. But first, lets discuss some security concepts:
 
 Let's talk about login id, passwords and session management:
 
