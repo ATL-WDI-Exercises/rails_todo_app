@@ -1,3 +1,3 @@
 # Be sure to restart your server when you modify this file.
 
-Rails.application.config.session_store :cookie_store, key: '_todo_app_auth_session'
+Rails.application.config.session_store :cookie_store, key: '_rails_todo_app_session'

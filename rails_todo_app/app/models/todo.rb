@@ -1,5 +1,4 @@
-class Todo < ActiveRecord::Base
-  belongs_to :user
+class Todo < ApplicationRecord
   validates :title, presence: true
 
   before_save :default_values
@@ -8,6 +7,6 @@ class Todo < ActiveRecord::Base
 
   def default_values
     self.completed ||= false
-    nil                           # required so that TX will not rollback!!!
+    nil                       # required so that the TX will not rollback!!!
   end
 end

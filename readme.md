@@ -5,35 +5,65 @@ Therefore *DO NOT* edit this file directly!
 Instead edit 'template.md' and then run 'md-process'.
 -->
 
-# TODO CRUD App in Rails with Home Grown AuthN and AuthZ
+# TODO CRUD App in Rails with Scaffolding and Home Grown AuthN and AuthZ
+
+## Table of Contents
+
+* [Introduction](#introduction)
+  * [Scaffolding](#scaffolding)
+    * [What is scaffolding?](#what-is-scaffolding?)
+  * [Security](#security)
+* [Steps to reproduce](#steps-to-reproduce)
+  * [Step 1 - Generate The Project](#step-1---generate-the-project)
+  * [Step 2 - Add Gems](#step-2---add-gems)
+  * [Step 3 - Configure Scaffold Generator](#step-3---configure-scaffold-generator)
+  * [Step 4 - Configure the Project for SASS and Bootstrap](#step-4---configure-the-project-for-sass-and-bootstrap)
+  * [Step 5 - Create a Static Pages Controller and Views, the NavBar, and the Flash Messages Support](#step-5---create-a-static-pages-controller-and-views-the-navbar-and-the-flash-messages-support)
+  * [Step 6 - Add MVC CRUD for the TODOs](#step-6---add-mvc-crud-for-the-todos)
+  * [Intermission](#intermission)
+  * [Step 7 - Add MVC CRUD for User](#step-7---add-mvc-crud-for-user)
+  * [Step 8 - Create a Sessions Controller](#step-8---create-a-sessions-controller)
+  * [Step 9 - Add a Nice Bootswatch Theme](#step-9---add-a-nice-bootswatch-theme)
+  * [Bonus LAB Material](#bonus-lab-material)
+  * [Step 10 - Patch Security Holes](#step-10---patch-security-holes)
+  * [Step 11 - Deploy to Heroku](#step-11---deploy-to-heroku)
+  * [Helpful Heroku Commands](#helpful-heroku-commands)
+    * [Managing Your App](#managing-your-app)
+    * [Debugging](#debugging)
+    * [General Commands](#general-commands)
+
+## Introduction
 
 This is a simple Rails App for a TODO list. This app uses the following technologies:
 
-* [Ruby 2.2](https://www.ruby-lang.org/)
-* [Rails 4.2](http://rubyonrails.org/)
-* [PostgreSQL 9.4](http://www.postgresql.org/)
+* [Ruby 3.1](https://www.ruby-lang.org/)
+* [Rails 5.0](http://rubyonrails.org/)
+* [PostgreSQL 9.5](http://www.postgresql.org/)
 * [Twitter Bootstrap 3.3](http://getbootstrap.com/)
 * [SASS 3.4](http://sass-lang.com/)
 * [bootstrap-generators 3.3](https://github.com/decioferreira/bootstrap-generators)
 
-We begin by building a simple Rails TODO app that uses SASS and Twitter Bootstrap for styling, and then add Authentication, Session Management, and Authorization. For educational purposes we are not using a 3rd party authentication library but we instead will build our own authentication and authorization as we go. For those who would like to investigate a 3rd party library for authentication and authorization, I recommend taking a look at [Devise](http://devise.plataformatec.com.br/).
+We begin by building a simple Rails TODO app that uses SASS and Twitter Bootstrap for styling, and then add Authentication, Session Management, and Authorization.
 
-The steps below will demonstrate how to create this project from scratch:
+### Scaffolding
 
-* [Step 1 - Generate The Project](#step-1---generate-the-project)
-* [Step 2 - Add Gems](#step-2---add-gems)
-* [Step 3 - Configure Scaffold Generator](#step-3---configure-scaffold-generator)
-* [Step 4 - Configure the Project for SASS and Bootstrap](#step-4---configure-the-project-for-sass-and-bootstrap)
-* [Step 5 - Create a Static Pages Controller and Views, the NavBar, and the Flash Messages Support](#step-5---create-a-static-pages-controller-and-views-the-navbar-and-the-flash-messages-support)
-* [Step 6 - Add MVC CRUD for the TODOs](#step-6---add-mvc-crud-for-the-todos)
-* [Intermission](#intermission)
-* [Step 7 - Add MVC CRUD for User](#step-7---add-mvc-crud-for-user)
-* [Step 8 - Create a Sessions Controller](#step-8---create-a-sessions-controller)
-* [Step 9 - Add a Nice Bootswatch Theme](#step-9---add-a-nice-bootswatch-theme)
-* [Bonus LAB Material](#bonus-lab-material)
-* [Step 10 - Patch Security Holes](#step-10---patch-security-holes)
-* [Step 11 - Deploy to Heroku](#step-11---deploy-to-heroku)
-* [Helpful Heroku Commands](#helpful-heroku-commands)
+![Scaffold](images/scaffold.jpg)
+
+Scaffolding is a _controversial_ subject because of the amount of _magic_ going on, but it is a tool that you should be familiar with.
+
+![images](images/rails-scaffold-oh-no-you-didnt.gif)
+
+#### What is scaffolding?
+
+_scaffold_: a temporary metal or wooden framework that is used to support workmen and materials during the erection, repair, etc, of a building or other construction.
+
+In _software development_ `scaffolding` is the generation of code that defines the basic structure of a project or feature, allowing for a quicker implementation of the final solution.
+
+> _Scaffolding_ is possible when many aspects of the project or feature follow a pre-defined structure (i.e. convention over configuration).
+
+### Security
+
+For educational purposes we are not using a 3rd party authentication library but we instead will build our own authentication and authorization as we go. For those who would like to investigate a 3rd party library for authentication and authorization, I recommend taking a look at [Devise](http://devise.plataformatec.com.br/).
 
 ## Steps to reproduce
 
@@ -43,9 +73,13 @@ The steps below will demonstrate how to create this project from scratch:
 > Note that the `rails new` command will create a new subdirectory for you.
 
 ```bash
-rails new --database=postgresql --skip-test-unit todo_app_auth
-cd todo_app_auth
+rails new --database=postgresql --skip-test rails_todo_app
+cd rails_todo_app
 rake db:create
+```
+
+1b. Save your work
+
 git init
 git add -A
 git commit -m "Created Rails project."
@@ -64,6 +98,7 @@ In this step we add some nice gems to help us with Rails development:
 
 ```ruby
 gem 'bootstrap-generators', '~> 3.3.4'
+gem 'record_tag_helper', '~> 1.0'
 
 gem 'bcrypt', '~> 3.1.7'                # uncomment this line
 
@@ -76,7 +111,7 @@ group :development, :test do
 end
 ```
 
-2b. Commit your changes:
+2b. Run bundler and Save your work:
 
 ```bash
 bundle install
@@ -89,7 +124,7 @@ git tag step2
 
 For this project we will be using rails generators to scaffold some of our MVC code. We will also be using the SASS/SCSS version of [Twitter Bootstrap](http://getbootstrap.com/) for styling.
 
-Unfortunately, the out-of-the-box rails generators produce views that are not easily compatible with Twitter Bootstrap. So we need to customize the generators to produce view code that contains Bootstrap styling. Fortunately there exist a gem called [bootstrap-generators](https://github.com/decioferreira/bootstrap-generators) that will assist us in this task.
+Unfortunately, the out-of-the-box rails _scaffold_ generators produce views that are not easily compatible with Twitter Bootstrap. So we need to customize the generators to produce view code that contains Bootstrap styling. Fortunately there exist a gem called [bootstrap-generators](https://github.com/decioferreira/bootstrap-generators) that will assist us in this task.
 
 3a. Install the custom templates:
 
@@ -109,7 +144,7 @@ module TodoApp
     end
 ```
 
-3c. Commit your changes:
+3c. Save your work:
 
 ```bash
 git add -A
@@ -121,24 +156,38 @@ git tag step3
 
 We will be using SASSy CSS (SCSS) for our styling and importing the Twitter Bootstrap SCSS files into our main `application.css.scss` file.
 
-The `bootstrap:install` command from Step 3 created the files `bootstrap-generators.scss` and `bootstrap-variables.scss`. We will be removing `bootstrap-generators.scss` and putting that code in our `application.css.scss` file. We will also rename `bootstrap-variables.scss` to add an '_' prefix to the name to signify that it is a SASS partial file.
+The `bootstrap:install` command from Step 3 created the files `app/assets/stylesheets/bootstrap-generators.scss` and `app/assets/stylesheets/bootstrap-variables.scss`. We will be removing `app/assets/stylesheets/bootstrap-generators.scss` and putting that code in our `application.css.scss` file. We will also rename `app/assets/stylesheets/bootstrap-variables.scss` to add an '_' prefix to the name to signify that it is a SASS partial file.
 
-We will also create the file `_bootstrap-custom-variables.scss` to hold any custom Bootstrap variables assignments we may want to define.
+We will also create the file `app/assets/stylesheets/_bootstrap-custom-variables.scss` to hold any custom Bootstrap variables assignments we may want to define.
 
-4a. Rename the `application.css` file to `application.css.scss`, remove
-`app/assets/stylesheets/bootstrap-generators.scss` and rename
-`app/assets/stylesheets/bootstrap-variables.scss`:
+4a. Refactor the SCSS files:
 
 ```bash
 mv app/assets/stylesheets/application.css app/assets/stylesheets/application.css.scss
 rm app/assets/stylesheets/bootstrap-generators.scss
 mv app/assets/stylesheets/bootstrap-variables.scss app/assets/stylesheets/_bootstrap-variables.scss
+touch app/assets/stylesheets/_bootstrap-custom-variables.scss
 ```
 
-4b. Remove *everything* from `application.css.scss` and replace it with the following:
+4b. Repace the contents of `app/assets/stylesheets/application.css.scss` with the following:
 
 ```sass
-// "bootstrap-sprockets" must be imported before "bootstrap" for the icon fonts to work.
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or any plugin's vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ */
+
 @import "bootstrap-variables.scss";
 @import "bootstrap-custom-variables.scss";
 @import "bootstrap-sprockets.scss";
@@ -176,14 +225,14 @@ main {
 }
 ```
 
-4c. Create the file `app/assets/stylesheets/_bootstrap-custom-variables.scss` with the following content:
+4c. Put the following content inside the file `app/assets/stylesheets/_bootstrap-custom-variables.scss`:
 
 ```sass
 // custom settings for Twitter Bootstrap
-$body-bg: #4af;
+// $body-bg: #def;
 ```
 
-4d. Commit your changes:
+4d. Save your work:
 
 ```bash
 git add -A
@@ -205,7 +254,8 @@ rails g controller static_pages home about
 
 ```ruby
   root to: 'static_pages#home'
-  match '/about', to: 'static_pages#about', via: 'get'
+  get 'home', to: 'static_pages#home', as: 'home'
+  get 'about', to: 'static_pages#about', as: 'about'
 ```
 
 5c. Edit `app/views/static_pages/home.html.erb` and replace the content with:
@@ -226,9 +276,9 @@ rails g controller static_pages home about
 <h2>A Simple TODO App with User Authentication</h2>
 <h4>Technologies include:</h4>
 <ul>
-  <li><a href="https://www.ruby-lang.org/">Ruby 2.2</a></li>
-  <li><a href="http://rubyonrails.org/">Rails 4.2</a></li>
-  <li><a href="http://www.postgresql.org/">PostgreSQL 9.4</a></li>
+  <li><a href="https://www.ruby-lang.org/">Ruby 2.3</a></li>
+  <li><a href="http://rubyonrails.org/">Rails 5.0</a></li>
+  <li><a href="http://www.postgresql.org/">PostgreSQL 9.5</a></li>
   <li><a href="http://getbootstrap.com/">Twitter Bootstrap 3.3</a></li>
   <li><a href="http://sass-lang.com/">SASS 3.4</a></li>
   <li><a href="https://github.com/decioferreira/bootstrap-generators">bootstrap-generators 3.3</a></li>
@@ -313,7 +363,14 @@ module ApplicationHelper
 end
 ```
 
-5j. Commit your changes:
+5j. Test it out
+
+* Run the server with `rails s`.
+* In your browser, load `localhost:3000`.
+* Use the NavBar to navigate between the `home` route and the `about` route.
+* Verify that the body background color is blue. Try changing it to another color (edit `app/assets/stylesheets/_bootstrap-custom-variables.scss` and refresh your browser tab). You can also comment out the line if you want the default Bootstrap body color.
+
+5k. Save your work:
 
 ```bash
 git add -A
@@ -327,9 +384,13 @@ We are finally ready to generate the MVC CRUD code for our TODOs list.
 
 6a. Generate the MVC CRUD for TODOs:
 
+Now for the _magic_ of scaffolding. We are going to use a _single command_ to create our model, controller, views, and the 7 RESTful routes! Furthermore, our controller methods and views will be fully functional!
+
 ```bash
 rails g scaffold todo title:string completed:boolean
 ```
+
+> Check out those controller methods and all of the views! Everything is there and is generated to work with Twitter Bootstrap!
 
 6b. Edit `db/migrate/<migration_script_name>` and add `null: false` to the
 `title` and `completed` columns, for instance:
@@ -348,10 +409,10 @@ rake db:migrate
 > Inspect the `config/routes.rb` file. A single line was added to configure
 the 7 routes for our TODOs resource. That's nice!!!
 
-6d. Edit `app/models/todo.rb` and add the following:
+6d. Edit `app/models/todo.rb` and replace the contents with the following:
 
 ```ruby
-class Todo < ActiveRecord::Base
+class Todo < ApplicationRecord
   validates :title, presence: true
 
   before_save :default_values
@@ -360,7 +421,7 @@ class Todo < ActiveRecord::Base
 
   def default_values
     self.completed ||= false
-    nil                           # required so that TX will not rollback!!!
+    nil                       # required so that the TX will not rollback!!!
   end
 end
 ```
@@ -368,7 +429,7 @@ end
 6e. Edit `app/views/layouts/_navigation_links.html.erb` and add a link to our todos view:
 
 ```html
-  <li><%= link_to 'TODOs', todos_path %></li>
+<li><%= link_to 'TODOs', todos_path %></li>
 ```
 
 6f. Edit `app/views/todos/index.html.erb` and
@@ -426,7 +487,8 @@ def toggle_completed
       format.html { redirect_to todos_path }
       format.json { render :show, status: :ok, location: @todo }
     else
-      # show some error message
+      format.html { render :index }
+      format.json { render json: @todo.errors, status: :unprocessable_entity }
     end
   end
 end
@@ -443,10 +505,17 @@ before_action :set_todo, only: [:show, :edit, :update, :destroy, :toggle_complet
 Edit `config/routes.rb` and add the following line:
 
 ```ruby
-  match 'todos/:id/toggle_completed', to: 'todos#toggle_completed', via: 'get'
+  get 'todos/:id/toggle_completed', to: 'todos#toggle_completed', as: 'toggle'
 ```
 
-6j. Commit your changes:
+6j. Test it out
+
+* Run the server with `rails s`.
+* In your browser, load `localhost:3000`.
+* Navigate to the TODOs route via the NavBar
+* Try creating, viewing, updating, and deleting some TODOs.
+
+6k. Save your work:
 
 ```bash
 git add -A
@@ -600,7 +669,7 @@ params.require(:user).permit(:first_name,
 
 7l. Edit `app/views/users/show.html.erb` and remove the `Back` button and the `password_digest` and `remember_token` fields.
 
-7m. Commit your changes:
+7m. Save your work:
 
 ```bash
 git add -A
@@ -829,7 +898,7 @@ and add the following:
   <%= link_to "Sign in",      signin_path, class: "btn btn-large btn-primary" %>
 ```
 
-8l. Commit your changes:
+8l. Save your work:
 
 ```bash
 git add -A
@@ -869,7 +938,7 @@ with
 <table class="table table-hover">
 ```
 
-9d. Commit your changes:
+9d. Save your work:
 
 ```bash
 git add -A
