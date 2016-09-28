@@ -19,18 +19,10 @@ Instead edit 'template.md' and then run 'md-process'.
   * [Step 3 - Configure Scaffold Generator](#step-3---configure-scaffold-generator)
   * [Step 4 - Configure the Project for SASS and Bootstrap](#step-4---configure-the-project-for-sass-and-bootstrap)
   * [Step 5 - Create a Static Pages Controller and Views, the NavBar, and the Flash Messages Support](#step-5---create-a-static-pages-controller-and-views-the-navbar-and-the-flash-messages-support)
-  * [Step 6 - Add MVC CRUD for the TODOs](#step-6---add-mvc-crud-for-the-todos)
-  * [Intermission](#intermission)
-  * [Step 7 - Add MVC CRUD for User](#step-7---add-mvc-crud-for-user)
-  * [Step 8 - Create a Sessions Controller](#step-8---create-a-sessions-controller)
-  * [Step 9 - Add a Nice Bootswatch Theme](#step-9---add-a-nice-bootswatch-theme)
-  * [Bonus LAB Material](#bonus-lab-material)
-  * [Step 10 - Patch Security Holes](#step-10---patch-security-holes)
-  * [Step 11 - Deploy to Heroku](#step-11---deploy-to-heroku)
-  * [Helpful Heroku Commands](#helpful-heroku-commands)
-    * [Managing Your App](#managing-your-app)
-    * [Debugging](#debugging)
-    * [General Commands](#general-commands)
+  * [Step 6 - Scaffold the Model, Views, Controller, and Routes for the TODOs](#step-6---scaffold-the-model-views-controller-and-routes-for-the-todos)
+* [Summary](#summary)
+  * [Adding Security](#adding-security)
+  * [For Further Development](#for-further-development)
 
 ## Introduction
 
@@ -44,6 +36,8 @@ This is a simple Rails App for a TODO list. This app uses the following technolo
 * [bootstrap-generators 3.3](https://github.com/decioferreira/bootstrap-generators)
 
 We begin by building a simple Rails TODO app that uses SASS and Twitter Bootstrap for styling, and then add Authentication, Session Management, and Authorization.
+
+---
 
 ### Scaffolding
 
@@ -65,6 +59,8 @@ In _software development_ `scaffolding` is the generation of code that defines t
 
 For educational purposes we are not using a 3rd party authentication library but we instead will build our own authentication and authorization as we go. For those who would like to investigate a 3rd party library for authentication and authorization, I recommend taking a look at [Devise](http://devise.plataformatec.com.br/).
 
+---
+
 ## Steps to reproduce
 
 ### Step 1 - Generate The Project
@@ -85,6 +81,8 @@ git add -A
 git commit -m "Created Rails project."
 git tag step1
 ```
+
+---
 
 ### Step 2 - Add Gems
 
@@ -120,6 +118,8 @@ git commit -m "Added gems."
 git tag step2
 ```
 
+---
+
 ### Step 3 - Configure Scaffold Generator
 
 For this project we will be using rails generators to scaffold some of our MVC code. We will also be using the SASS/SCSS version of [Twitter Bootstrap](http://getbootstrap.com/) for styling.
@@ -128,9 +128,13 @@ Unfortunately, the out-of-the-box rails _scaffold_ generators produce views that
 
 3a. Install the custom templates:
 
+We want to install custom _Bootstrap_ templates for our scaffold generator.
+
 ```bash
 rails generate bootstrap:install -f
 ```
+
+> The custom templates were installed in the folder `lib/templates/erb`. Feel free to check them out!
 
 3b. Add the following to `config/application.rb`:
 
@@ -151,6 +155,8 @@ git add -A
 git commit -m "Configured custom templates for Scaffolding"
 git tag step3
 ```
+
+---
 
 ### Step 4 - Configure the Project for SASS and Bootstrap
 
@@ -239,6 +245,8 @@ git add -A
 git commit -m "Configured for Bootstrap SASS"
 git tag step4
 ```
+
+---
 
 ### Step 5 - Create a Static Pages Controller and Views, the NavBar, and the Flash Messages Support
 
@@ -378,7 +386,9 @@ git commit -m "Added static pages, navbar, and flash messages."
 git tag step5
 ```
 
-### Step 6 - Add MVC CRUD for the TODOs
+---
+
+### Step 6 - Scaffold the Model, Views, Controller, and Routes for the TODOs
 
 We are finally ready to generate the MVC CRUD code for our TODOs list.
 
@@ -523,7 +533,9 @@ git commit -m "Created MVC CRUD for a list of TODOs."
 git tag step6
 ```
 
-### Intermission
+---
+
+## Summary
 
 Let's reflect on what we have done:
 
@@ -548,525 +560,18 @@ Let's talk about login id, passwords and session management:
 * password confirmation  - make sure the user correctly creates their password
 * keep user sessions     - use browser cookie containing a `remember_token` that is persisted in database
 
-### Step 7 - Add MVC CRUD for User
+---
 
-To add AuthN/AuthZ and Session Management, we first need to add a User model and its associated MVC CRUD operations to our app.
+### Adding Security
 
-7a. Scaffold out the MVC CRUD for a User
+* [Custom Security](security-custom.md)
+* [Devise Security](security-devise.md)
 
-```bash
-rails g scaffold user first_name:string last_name:string email:string:uniq password_digest:string remember_token:string
-```
+---
 
-7b. Edit the `create_users` migration script and add `null: false` to the
-`first_name`, `last_name`, `email`, and `password_digest` columns.
+### For Further Development
 
-7c. Create a migration to add a relationship from `todo` to `user`:
-
-```bash
-rails g migration AddUserRefToTodos user:references
-```
-
-7d. Edit the `add_user_ref_to_todos` migration script and add a not-null constraint: `null: false`
-
-7e. Run the migrations:
-
-```bash
-rake db:migrate
-```
-
-and inspect the file `db/schema.rb` to ensure that the model / table looks correct.
-
-7f. Edit `app/models/user.rb` and add the following:
-
-```ruby
-class User < ActiveRecord::Base
-
-  has_many :todos, dependent: :destroy
-
-  before_save { email.downcase! }
-
-  validates :first_name, :last_name, presence: true
-
-  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(?:\.[a-z\d\-]+)*\.[a-z]+\z/i
-  validates :email, presence: true, length: { maximum: 80 },
-                    format: { with: VALID_EMAIL_REGEX },
-                    uniqueness: { case_sensitive: false }
-
-  # Add methods to set and authenticate against a BCrypt password.
-  has_secure_password
-
-  validates :password, length: { minimum: 8, maximum: 20 }
-
-  validate :password_complexity
-
-  def self.new_remember_token
-    SecureRandom.urlsafe_base64
-  end
-
-  def self.digest(token)
-    Digest::SHA1.hexdigest(token.to_s)
-  end
-
-  def password_complexity
-    if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)./)
-      errors.add :password, "must include at least one lowercase letter, one uppercase letter, and one digit"
-    end
-  end
-
-  def to_s
-    email
-  end
-end
-```
-
-7g. Edit `app/models/todo.rb` and add the following line:
-
-```ruby
-belongs_to :user
-```
-
-7h. Edit `app/controllers/users_controller.rb` and near the bottom replace the following line:
-
-```ruby
-params.require(:user).permit(:first_name,
-                             :last_name,
-                             :email,
-                             :password_digest,
-                             :remember_token)
-```
-
-with
-
-```ruby
-params.require(:user).permit(:first_name,
-                             :last_name,
-                             :email,
-                             :password,
-                             :password_confirmation)
-```
-
-7i. Edit `app/views/users/_form.html.erb` and change the `password_digest` and `remember_token` input labels and fields to:
-
-```html
-  <div class="form-group">
-    <%= f.label :password, class: "col-sm-2 control-label" %>
-    <div class="col-sm-10">
-      <%= f.password_field :password, class: "form-control" %>
-    </div>
-  </div>
-  <div class="form-group">
-    <%= f.label :password_confirmation, class: "col-sm-2 control-label" %>
-    <div class="col-sm-10">
-      <%= f.password_field :password_confirmation, class: "form-control" %>
-    </div>
-  </div>
-```
-
-7j. Edit `app/views/users/edit.html.erb` and remove the `Back` button
-
-7k. Edit `app/views/users/new.html.erb` and remove the `Back` button and replace `<h1>New user</h1>` with `<h1>Sign Up</h1>`
-
-7l. Edit `app/views/users/show.html.erb` and remove the `Back` button and the `password_digest` and `remember_token` fields.
-
-7m. Save your work:
-
-```bash
-git add -A
-git commit -m "Added MVC CRUD for User"
-git tag step7
-```
-
-### Step 8 - Create a Sessions Controller
-
-In this step we will create a `SessionsController` to handle our *sign-in* via its `new` and `create` actions and *sign-out* via its `destroy` action. We will also modify the `UsersController` so that its `new` and `create` actions will handle *sign-up* (i.e. registration). We will also create a `SessionsHelper` module to provide common authentication and session management support. Finally we will add dynamically controlled navigation links so that the appropriate links appear on the `navbar` depending on whether the user is currently signed in.
-
-8a. Create `app/controllers/sessions_controller.rb` and `app/views/sessions/new.html.erb`
-
-```bash
-rails g controller sessions new create destroy
-```
-
-8b. Edit `app/views/sessions/new.html.erb` and insert the following content:
-
-```html
-<% provide(:title, "Sign in") %>
-<h1>Sign in</h1>
-
-<div class="row">
-  <div class="span6 offset3">
-    <%= form_for(:session, url: sessions_path) do |f| %>
-
-      <%= f.label :email %>
-      <%= f.text_field :email %>
-
-      <%= f.label :password %>
-      <%= f.password_field :password %>
-
-      <%= f.submit "Sign in", class: "btn btn-large btn-primary" %>
-    <% end %>
-
-    <p>New user? <%= link_to "Sign up now!", signup_path %></p>
-  </div>
-</div>
-```
-
-8c. Add the following to `app/helpers/sessions_helper.rb`:
-
-```ruby
-module SessionsHelper
-
-  def sign_in(user)
-    # save a cookie on their computer
-    remember_token = User.new_remember_token
-    cookies.permanent[:remember_token] = remember_token
-    # update our database with their cookie info
-    user.update_attribute(:remember_token, User.digest(remember_token))
-    # set a current_user variable equal to user
-    self.current_user = user
-  end
-
-  def signed_in?
-    !current_user.nil?
-  end
-
-  # set the current_user from the remember_token cookie
-  def current_user=(user)
-    @current_user = user
-  end
-
-  def current_user
-    remember_token  = User.digest(cookies[:remember_token])
-    @current_user ||= User.find_by(remember_token: remember_token)
-  end
-
-  # check if the specified user is the current user
-  def current_user?(user)
-    user == current_user
-  end
-
-  # security check, ensure user is signed in, if not, redirect to signin page.
-  def signed_in_user
-    unless signed_in?
-      store_location
-      redirect_to signin_url, notice: "Please sign in."
-    end
-  end
-
-  def sign_out
-    current_user.update_attribute(:remember_token,
-                                  User.digest(User.new_remember_token))
-    cookies.delete(:remember_token)
-    self.current_user = nil
-  end
-
-  # redirect back to the original requested view or to default
-  def redirect_back_or(default)
-    redirect_to(session[:return_to] || default)
-    session.delete(:return_to)
-  end
-
-  # store the current location to support the redirect_back feature
-  def store_location
-    session[:return_to] = request.url if request.get?
-  end
-end
-```
-
-8d. Edit `app/controllers/sessions_controller.rb` to have the following content:
-
-```ruby
-class SessionsController < ApplicationController
-
-  def new
-  end
-
-  def create
-    user = User.find_by(email: params[:session][:email].downcase)
-    if user && user.authenticate(params[:session][:password])
-      sign_in user
-      redirect_back_or todos_path
-    else
-      flash.now[:error] = 'Invalid email/password combination'
-      render 'new'
-    end
-  end
-
-  def destroy
-    sign_out
-    redirect_to root_url
-  end
-end
-```
-
-8e. Edit `app/controllers/users_controller.rb`:
-
-Modify the `create` method to call the `sign_in` helper method and change the `redirect_to` target path and notice:
-
-```ruby
-  def create
-    @user = User.new(user_params)
-
-    respond_to do |format|
-      if @user.save
-        sign_in @user
-        format.html { redirect_to root_path, notice: 'Welcome!' }
-        format.json { render :show, status: :created, location: @user }
-      else
-        format.html { render :new }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-```
-
-8f. Edit `config/routes.rb` and replace
-
-```ruby
-  get 'sessions/new'
-  get 'sessions/create'
-  get 'sessions/destroy'
-```
-with
-
-```ruby
-  resources :sessions, only:[:new, :create, :destroy]
-```
-
-and add the following:
-
-```ruby
-  match '/signup',  to: 'users#new',            via: 'get'
-  match '/signin',  to: 'sessions#new',         via: 'get'
-  match '/signout', to: 'sessions#destroy',     via: 'delete'
-```
-
-8g. Edit `app/controllers/application_controller.rb` and add the following line:
-
-```ruby
-  include SessionsHelper
-```
-
-8h. Edit `app/controllers/static_pages_controller.rb` and add a redirect to the
-  `home` action:
-
-```ruby
-  def home
-    redirect_to todos_path if signed_in?
-  end
-```
-
-8i. Edit `app/controllers/todos_controller.rb`:
-
-* add `before_action :signed_in_user`
-* edit the `index` method:
-
-```ruby
-  def index
-    @todos = current_user.todos.order(created_at: :desc)
-  end
-```
-
- * edit the `create` method to associate the user to a newly created Todo:
-
-```ruby
-  def create
-    @todo = Todo.new(todo_params)
-    @todo.user = current_user       # associate the new todo to the current_user
-    ...
-```
-
-8j. Update `app/views/layouts/_navigation_links.html.erb` to match the following:
-
-```html
-<% if signed_in? %>
-  <li><%= link_to 'TODOs', todos_path %></li>
-  <li><%= link_to @current_user, user_path(@current_user) %></li>
-  <li><%= link_to 'Sign out', signout_path, method: 'delete' %></li>
-<% else %>
-  <li><%= link_to 'Sign up', signup_path %></li>
-  <li><%= link_to 'Sign in', signin_path %></li>
-<% end %>
-<li><%= link_to 'About', '/about' %></li>
-```
-
-8k. Edit `app/views/static_pages/home.html.erb` and add the following buttons to the bottom of the jumbotron:
-
-```html
-  <br/>
-  <%= link_to "Sign up now!", signup_path, class: "btn btn-large btn-primary" %>
-  <%= link_to "Sign in",      signin_path, class: "btn btn-large btn-primary" %>
-```
-
-8l. Save your work:
-
-```bash
-git add -A
-git commit -m "Create the Sessions Controller, Sessions Helper, and navigation links."
-git tag step8
-```
-
-### Step 9 - Add a Nice Bootswatch Theme
-
-In this step we will add a [Bootswatch](https://bootswatch.com/) theme to our project, but instead of copying the bootswatch css into our project we will use a SASSy version of Bootswatch called [Bootswatch-Sass](https://github.com/log0ymxm/bootswatch-scss).
-
-9a. Create the following files:
-
-* _superhero-variables.scss - content from [Superhero Variables](https://raw.githubusercontent.com/log0ymxm/bootswatch-scss/master/superhero/_variables.scss)
-* _superhero.scss - content from [Superhero Overrides](https://github.com/log0ymxm/bootswatch-scss/blob/master/superhero/_bootswatch.scss)
-
-9b. Modify the imports in `app/assets/stylesheets/application.css.scss`:
-
-```sass
-@import "superhero-variables.scss";
-@import "bootstrap-variables.scss";
-@import "bootstrap-custom-variables.scss";
-@import "bootstrap-sprockets.scss";
-@import "bootstrap.scss";
-@import "superhero.scss";
-```
-
-9c. Modify `app/views/todos/index.html.erb` and replace
-
-```html
-<table class="table table-striped table-bordered table-hover">
-```
-
-with
-
-```html
-<table class="table table-hover">
-```
-
-9d. Save your work:
-
-```bash
-git add -A
-git commit -m "Added superhero Bootswatch theme."
-git tag step9
-```
-
-### Bonus LAB Material
-
-* Check for security holes and fix them:
-  - See what routes a user can manually enter into the browser even if the
-    user is not logged in
-  - Can a user edit the account of another user? Can a user change another
-    user's password?
-  - See if a user can manually enter the URL for a TODO that is not one of
-    their TODOs. Can the user edit or delete TODOs that they do not own?
-* Change the UX:
-  - Add a nice background image.
-  - Try using other Bootswatch themes.
-  - Change the NavBar.
-* Add some more information to a user, such as `phone`, `city` and `state`, `occupation`, etc.
-* Add some more attributes to a TODO, such as a `due_date` and a `priority`.
-* Add a set of `keywords` to a Todo. There should be a `many-to-many` relationship between `todos` and `keywords` and the code should *not* create duplicate keywords.
-* Replace the manual authentication with a gem like [Devise](http://devise.plataformatec.com.br/).
-
-
-### Step 10 - Patch Security Holes
-
-10a. Edit `app/controllers/users_controller.rb` and do the following:
-
-* Add the following before actions:
-
-```ruby
-   before_action :signed_in_user, only: [:index, :show, :edit, :update, :destroy]
-   before_action :verify_correct_user, only: [:show, :edit, :update, :destroy]
-```
-
-* Add the `verify_correct_user` private method:
-
-```ruby
-     def verify_correct_user
-       user = User.find_by(id: params[:id])
-       redirect_to root_url, notice: 'Access Denied!' unless current_user?(user)
-     end
-```
-
-10b. Edit `app/controllers/todos_controller.rb` and do the following:
-
-* Add the following before actions:
-
-```ruby
-  before_action :signed_in_user
-  before_action :set_todo, only: [:toggle_completed, :show, :edit, :update, :destroy]
-  before_action :verify_correct_user, only: [:show, :edit, :update, :destroy]
-```
-
-* Add the `verify_correct_user` private method:
-
-```ruby
-     def verify_correct_user
-       @todo = current_user.todos.find_by(id: params[:id])
-       redirect_to root_url, notice: 'Access Denied!' if @todo.nil?
-     end
-```
-
-### Step 11 - Deploy to Heroku
-
-11a. Make sure you have a Heroku account - https://signup.heroku.com/login
-
-11b. Download and install the Heroku Toolbelt - https://toolbelt.heroku.com/
-
-11c. Add the `rails_12factor` gem to the `Gemfile`:
-
-```ruby
-gem 'rails_12factor', group: :production
-```
-
-Then run `bundle install` and save your work:
-
-```bash
-bundle install
-git add -A
-git commit -m "Added rails_12factor"
-git tag step11
-```
-
-11d. Configure your git repo for Heroku, push to Heroku, and run a db:migrate remotely on Heroku:
-
-```bash
-heroku create
-git push heroku master
-heroku run rake db:migrate
-heroku open
-```
-
-### Helpful Heroku Commands
-
-#### Managing Your App
-
-```bash
-heroku open                                 # open your app in a browser tab
-heroku ps                                   # see the status of your heroku servers
-heroku logs                                 # view the logs
-heroku addons:create heroku-postgresql:dev  # add a PostgreSQL development DB
-heroku addons:create mongolab:sandbox       # add a MongoLab DB
-heroku run rake db:migrate                  # run db migrations
-heroku run rake db:seed                     # run seeds.rb file
-heroku run:detached rake db:migrate         # run detached from Terminal
-```
-
-#### Debugging
-
-```bash
-heroku ps             # list process status of heroku processes
-heroku releases       # list releases deployed to heroku for current app
-heroku logs           # display logs for an app
-heroku logs -n 1500   # default is 100 lines, but you can get up to 1500
-heroku login          # authenticate with heroku so that you can connect
-heroku run bash       # connect to heroku host machine
-```
-
-#### General Commands
-
-```bash
-heroku help                             # prints help
-heroku list                             # list all of your heroku apps
-heroku info                             # prints info about the heroku project
-heroku config                           # prints heroku environment variables
-heroku config:set NODE_ENV=development  # set environment variable
-heroku apps:rename <new_name>           # rename a heroku project; changes URL
-```
+* [Add a Bootswatch Theme](bootswatch.md)
+* [Bonuses](bonuses.md)
+* [Deploying to Heroku](heroku-deployment.md)
+* [Helpful Heroku Commands](heroku-notes.md)
