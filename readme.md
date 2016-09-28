@@ -76,6 +76,7 @@ rake db:create
 
 1b. Save your work
 
+```bash
 git init
 git add -A
 git commit -m "Created Rails project."
