@@ -336,7 +336,7 @@ the 7 routes for our TODOs resource. That's nice!!!
 ...
         <!-- <td><%= todo.completed %></td> -->
         <td>
-        <%= link_to("/todos/#{todo.id}/toggle_completed") do %>
+        <%= link_to(toggle_path(todo)) do %>
           <% if todo.completed %>
             <span class="glyphicon glyphicon-ok"></span>
           <% else %>
