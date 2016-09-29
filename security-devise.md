@@ -125,6 +125,10 @@ rails s
   <%= link_to "Sign in",      new_user_session_path,      class: "btn btn-large btn-primary" %>
 ```
 
+7c. Verify that the NavBar looks good:
+
+![Updated NavBar](images/navbar-with-signup-signin.png)
+
 ## Step 8 - Add Authorization
 
 We have some basic Authorization working (only authenticated users can navigate to the Todo routes) but we still have some Authorization bugs to work out. Specifically we need to:
