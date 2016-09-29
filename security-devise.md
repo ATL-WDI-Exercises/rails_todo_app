@@ -127,7 +127,7 @@ rails s
 
 7c. Verify that the NavBar looks good:
 
-![Updated NavBar](images/navbar-with-signup-signin.png)
+<img src="images/navbar-with-signup-signin.png" width="600px">
 
 ## Step 8 - Add Authorization
 
