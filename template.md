@@ -438,14 +438,14 @@ Let's talk about login id, passwords and session management:
 
 ---
 
-### Adding Security
+## Adding Security
 
 * [Custom Security](security-custom.md)
 * [Devise Security](security-devise.md)
 
 ---
 
-### For Further Development
+## For Further Development
 
 * [Add a Bootswatch Theme](bootswatch.md)
 * [Bonuses](bonuses.md)

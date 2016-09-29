@@ -21,8 +21,8 @@ Instead edit 'template.md' and then run 'md-process'.
   * [Step 5 - Create a Static Pages Controller and Views, the NavBar, and the Flash Messages Support](#step-5---create-a-static-pages-controller-and-views-the-navbar-and-the-flash-messages-support)
   * [Step 6 - Scaffold the Model, Views, Controller, and Routes for the TODOs](#step-6---scaffold-the-model-views-controller-and-routes-for-the-todos)
 * [Summary](#summary)
-  * [Adding Security](#adding-security)
-  * [For Further Development](#for-further-development)
+* [Adding Security](#adding-security)
+* [For Further Development](#for-further-development)
 
 ## Introduction
 
@@ -563,14 +563,14 @@ Let's talk about login id, passwords and session management:
 
 ---
 
-### Adding Security
+## Adding Security
 
 * [Custom Security](security-custom.md)
 * [Devise Security](security-devise.md)
 
 ---
 
-### For Further Development
+## For Further Development
 
 * [Add a Bootswatch Theme](bootswatch.md)
 * [Bonuses](bonuses.md)
