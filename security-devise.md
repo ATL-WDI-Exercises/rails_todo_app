@@ -7,7 +7,9 @@ Instead edit 'template.md' and then run 'md-process'.
 
 # Adding Security to our TODOs App using _Devise_
 
-![Rails Devise](images/rails-devise.png)
+<p align="center">
+  <img src="images/rails-devise.png" width="600px">
+</p>
 
 ## Table of Contents
 
