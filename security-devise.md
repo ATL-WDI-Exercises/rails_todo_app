@@ -7,6 +7,8 @@ Instead edit 'template.md' and then run 'md-process'.
 
 # Adding Security to our TODOs App using _Devise_
 
+![Rails Devise](images/rails-devise.png)
+
 ## Table of Contents
 
 * [Step 1 - Create a Git Branch](#step-1---create-a-git-branch)

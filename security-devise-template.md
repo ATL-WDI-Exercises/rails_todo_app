@@ -1,5 +1,7 @@
 # Adding Security to our TODOs App using _Devise_
 
+![Rails Devise](images/rails-devise.png)
+
 {{ TOC }}
 
 ## Step 1 - Create a Git Branch
