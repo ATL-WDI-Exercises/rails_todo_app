@@ -20,6 +20,7 @@ Instead edit 'template.md' and then run 'md-process'.
 * [Step 7 - Add Signup, Login, and Logout Links to the NavBar](#step-7---add-signup-login-and-logout-links-to-the-navbar)
 * [Step 8 - Add Authorization](#step-8---add-authorization)
 * [Step 9 - Check for security holes and fix them](#step-9---check-for-security-holes-and-fix-them)
+* [Step 10 - Merge Feature Branch Into Master](#step-10---merge-feature-branch-into-master)
 * [References](#references)
 
 ## Step 1 - Create a Git Branch
@@ -198,6 +199,12 @@ and inspect the file `db/schema.rb` to ensure that the model / table looks corre
 * Can a user edit the account of another user? Can a user change another user's password?
 * See if a user can manually enter the URL for a TODO that is not one of their TODOs. Can the user edit or delete TODOs that they do not own?
 
+## Step 10 - Merge Feature Branch Into Master
+
+```bash
+git checkout master
+git merge devise
+```
 
 ## References
 

@@ -180,6 +180,12 @@ and inspect the file `db/schema.rb` to ensure that the model / table looks corre
 * Can a user edit the account of another user? Can a user change another user's password?
 * See if a user can manually enter the URL for a TODO that is not one of their TODOs. Can the user edit or delete TODOs that they do not own?
 
+## Step 10 - Merge Feature Branch Into Master
+
+```bash
+git checkout master
+git merge devise
+```
 
 ## References
 
