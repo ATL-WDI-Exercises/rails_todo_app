@@ -1,24 +1,6 @@
-<!--
-This file is auto-generated from a 'template.md'
-file using the 'md-process' script.
-Therefore *DO NOT* edit this file directly!
-Instead edit 'template.md' and then run 'md-process'.
--->
-
 # Adding Security to our TODOs App using _Devise_
 
-## Table of Contents
-
-* [Step 1 - Create a Git Branch](#step-1---create-a-git-branch)
-* [Step 2 - Add the Devise Gem and install Devise](#step-2---add-the-devise-gem-and-install-devise)
-* [Step 3 - Add a Default URL for sending EMail from Devise](#step-3---add-a-default-url-for-sending-email-from-devise)
-* [Step 4 - Install the Devise Views](#step-4---install-the-devise-views)
-* [Step 5 - Generate the User Model configured with Devise AuthN.](#step-5---generate-the-user-model-configured-with-devise-authn)
-* [Step 6 - Secure the TODOs Routes](#step-6---secure-the-todos-routes)
-* [Step 7 - Add Signup, Login, and Logout Links to the NavBar](#step-7---add-signup-login-and-logout-links-to-the-navbar)
-* [Step 8 - Add Authorization](#step-8---add-authorization)
-* [Step 9 - Check for security holes and fix them](#step-9---check-for-security-holes-and-fix-them)
-* [References](#references)
+{{ TOC }}
 
 ## Step 1 - Create a Git Branch
 
